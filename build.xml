@@ -1,0 +1,8 @@
+<?xml version = "1.0"?>
+<project name = "SimpleWebServer" basedir = ".">
+	
+	<target name="WebServer">
+	    <classpath refid="run.WebServer.classpath"/>
+	</target>
+	
+</project>
