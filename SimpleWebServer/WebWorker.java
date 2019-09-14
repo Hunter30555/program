@@ -21,6 +21,9 @@
 **/
 
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.lang.Runnable;
 import java.io.*;
 import java.util.Date;
@@ -31,6 +34,7 @@ public class WebWorker implements Runnable
 {
 
 private Socket socket;
+private Path httpFile;  //The Path to the file trying to be accessed
 
 /**
 * Constructor: must have a valid open socket
@@ -75,6 +79,16 @@ private void readHTTPRequest(InputStream is)
       try {
          while (!r.ready()) Thread.sleep(1);
          line = r.readLine();
+         if(line.length() > 9)
+         {
+        	//Looks at the line with the directory path and removes the GET and HTTP/ 1.1
+	         if(line.substring(0,3).equals("GET")) 
+	         {
+	        	//The file should just be the directory path now
+	        	 httpFile = Paths.get(line.substring(5, line.length() - 9));
+	        	 System.err.println(httpFile);
+	         }//End if
+         }//End if
          System.err.println("Request line: ("+line+")");
          if (line.length()==0) break;
       } catch (Exception e) {
@@ -95,7 +109,16 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    Date d = new Date();
    DateFormat df = DateFormat.getDateTimeInstance();
    df.setTimeZone(TimeZone.getTimeZone("GMT"));
-   os.write("HTTP/1.1 200 OK\n".getBytes());
+   try  //If the File exists returns a header with "200 OK" 
+   {
+	  String s1 = Files.readString(httpFile);
+	  Files.exists(httpFile);
+	  os.write("HTTP/1.1 200 OK\n".getBytes());
+   }
+   catch(Exception e) //If the File doesn't exist returns an HTTP header with "400 Not Found" 
+   {
+	  os.write("HTTP/1.1 404 Not Found\n".getBytes());
+   }//End try-catch
    os.write("Date: ".getBytes());
    os.write((df.format(d)).getBytes());
    os.write("\n".getBytes());
@@ -116,9 +139,32 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
 **/
 private void writeContent(OutputStream os) throws Exception
 {
-   os.write("<html><head></head><body>\n".getBytes());
-   os.write("<h3>My web server works!</h3>\n".getBytes());
-   os.write("</body></html>\n".getBytes());
-}
+	try //Writes the File if the file exists
+	{
+		//Stores the File into a string and calls exception if it doesn't exist
+		Files.exists(httpFile);
+		String s1 = Files.readString(httpFile);
+		
+		//Creates the date and time in Mountain Time
+		Date d = new Date();
+		DateFormat df = DateFormat.getDateTimeInstance();
+		df.setTimeZone(TimeZone.getTimeZone("America/Denver"));
+		
+		//Turns the date into string
+		String dateString = df.format(d);
+		
+		//Replaces all the iterations of certain tags with teir replacements
+		String s2 = s1.replaceAll("<cs371date>", dateString);
+		String s3 = s2.replaceAll("<cs371server>", "Test Server");
+		
+		//Outputs to the os after replacements are done
+		os.write(s3.getBytes());
+	}
+	catch (Exception e) //If the file does not exists displays a 404 error
+	{
+        //System.err.println("404 error");
+        os.write("404 Not Found".getBytes());
+	}//End try-catch
+}//End writeContent
 
 } // end class

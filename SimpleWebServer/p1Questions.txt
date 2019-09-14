@@ -1,0 +1,8 @@
+1. Time Estimated 1.5 hours
+
+2.  Thought/Design: 3.0
+    Programming:    1.0
+    Debugging:      0.5
+    TOTAL:          4.5
+
+3. Percent accuracy of original to estimated: 300% of what was estimated
