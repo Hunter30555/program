@@ -34,7 +34,7 @@ public class WebWorker implements Runnable
 {
 
 private Socket socket;
-private Path httpFile;  //The Path to the file trying to be accessed
+private Path webAddressFile;  //The Path to the file trying to be accessed
 
 /**
 * Constructor: must have a valid open socket
@@ -85,8 +85,8 @@ private void readHTTPRequest(InputStream is)
 	         if(line.substring(0,3).equals("GET")) 
 	         {
 	        	//The file should just be the directory path now
-	        	 httpFile = Paths.get(line.substring(5, line.length() - 9));
-	        	 System.err.println(httpFile);
+	        	 webAddressFile = Paths.get(line.substring(5, line.length() - 9));
+	        	 System.err.println(webAddressFile);
 	         }//End if
          }//End if
          System.err.println("Request line: ("+line+")");
@@ -111,8 +111,8 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    df.setTimeZone(TimeZone.getTimeZone("GMT"));
    try  //If the File exists returns a header with "200 OK" 
    {
-	  String s1 = Files.readString(httpFile);
-	  Files.exists(httpFile);
+	  String s1 = Files.readString(webAddressFile);
+	  Files.exists(webAddressFile);
 	  os.write("HTTP/1.1 200 OK\n".getBytes());
    }
    catch(Exception e) //If the File doesn't exist returns an HTTP header with "400 Not Found" 
@@ -142,8 +142,8 @@ private void writeContent(OutputStream os) throws Exception
 	try //Writes the File if the file exists
 	{
 		//Stores the File into a string and calls exception if it doesn't exist
-		Files.exists(httpFile);
-		String s1 = Files.readString(httpFile);
+		Files.exists(webAddressFile);
+		String s1 = Files.readString(webAddressFile);
 		
 		//Creates the date and time in Mountain Time
 		Date d = new Date();
