@@ -29,15 +29,12 @@ import java.io.*;
 import java.util.Date;
 import java.text.DateFormat;
 import java.util.TimeZone;
-//import javax.imageio;
 
 public class WebWorker implements Runnable
 {
 
 private Socket socket;
 private Path webAddressFile;  //The Path to the file trying to be accessed
-private String fileType;      //The filetype can be html, jpeg, gif, png
-private String contentType;   //The contentype is image/fileType or text/fileType
 
 /**
 * Constructor: must have a valid open socket
@@ -60,9 +57,7 @@ public void run()
       InputStream  is = socket.getInputStream();
       OutputStream os = socket.getOutputStream();
       readHTTPRequest(is);
-      
-      writeHTTPHeader(os, contentType); //contentType is established in readHTTPRequest
-      
+      writeHTTPHeader(os,"text/html");
       writeContent(os);
       os.flush();
       socket.close();
@@ -86,33 +81,12 @@ private void readHTTPRequest(InputStream is)
          line = r.readLine();
          if(line.length() > 9)
          {
-        	//Looks at the line with the directory path and removes the GET and HTTP/ 1.1-----------this should end in jpeg, png, gif
+        	//Looks at the line with the directory path and removes the GET and HTTP/ 1.1
 	         if(line.substring(0,3).equals("GET")) 
 	         {
 	        	//The file should just be the directory path now
 	        	 webAddressFile = Paths.get(line.substring(5, line.length() - 9));
 	        	 System.err.println(webAddressFile);
-	        	 
-	        	 fileType = line.substring(line.indexOf('.') + 1, line.length() - 9);
-	        	 //System.err.println(fileType); 
-	             switch(fileType) 
-	             { 
-	                 case "jpeg": 
-	                     System.err.println("jpeg"); 
-	                     contentType = "image/jpeg";
-	                     break; 
-	                 case "gif": 
-	                     System.err.println("gif");
-	                     contentType = "image/gif";
-	                     break; 
-	                 case "png": 
-	                     System.err.println("png"); 
-	                     contentType = "image/png";
-	                     break; 
-	                 default:                                     //Default file type is html and content type is text/html
-	                     System.err.println("unknown file type"); 
-	                     contentType = "text/html";
-	             } 
 	         }//End if
          }//End if
          System.err.println("Request line: ("+line+")");
@@ -137,7 +111,7 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    df.setTimeZone(TimeZone.getTimeZone("GMT"));
    try  //If the File exists returns a header with "200 OK" 
    {
-	  //String s1 = Files.readString(webAddressFile);
+	  String s1 = Files.readString(webAddressFile);
 	  Files.exists(webAddressFile);
 	  os.write("HTTP/1.1 200 OK\n".getBytes());
    }
@@ -148,7 +122,7 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    os.write("Date: ".getBytes());
    os.write((df.format(d)).getBytes());
    os.write("\n".getBytes());
-   os.write("Server: Test Server\n".getBytes());
+   os.write("Server: Jon's very own server\n".getBytes());
    //os.write("Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT\n".getBytes());
    //os.write("Content-Length: 438\n".getBytes()); 
    os.write("Connection: close\n".getBytes());
@@ -158,10 +132,6 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    return;
 }
 
-public String convertFromBaseToBase(String str, int fromBase, int toBase) 
-{
-    return Integer.toString(Integer.parseInt(str, fromBase), toBase);
-}
 /**
 * Write the data content to the client network connection. This MUST
 * be done after the HTTP header has been written out.
@@ -169,60 +139,32 @@ public String convertFromBaseToBase(String str, int fromBase, int toBase)
 **/
 private void writeContent(OutputStream os) throws Exception
 {
-	if(contentType.substring(0,4).equals("text"))
+	try //Writes the File if the file exists
 	{
-		try //Writes the File if the file exists
-		{
-			//Stores the File into a string and calls exception if it doesn't exist
-			Files.exists(webAddressFile);
-			String s1 = Files.readString(webAddressFile);
-			
-			//Creates the date and time in Mountain Time
-			Date d = new Date();
-			DateFormat df = DateFormat.getDateTimeInstance();
-			df.setTimeZone(TimeZone.getTimeZone("America/Denver"));
-			
-			//Turns the date into string
-			String dateString = df.format(d);
-			
-			//Replaces all the iterations of certain tags with their replacements
-			String s2 = s1.replaceAll("<cs371date>", dateString);
-			String s3 = s2.replaceAll("<cs371server>", "Test Server");
-			
-			//Outputs to the os after replacements are done
-			os.write(s3.getBytes());
-		}
-		catch (Exception e) //If the file does not exists displays a 404 error
-		{
-			System.err.println(webAddressFile +" is not found");
-	        //System.err.println("404 error");
-	        os.write("404 Not Found".getBytes());
-		}//End try-catch
-	}//End if
-	else //If the content type starts with image/
-	{
-		try //Writes the File if the file exists
-		{
+		//Stores the File into a string and calls exception if it doesn't exist
+		Files.exists(webAddressFile);
+		String s1 = Files.readString(webAddressFile);
 		
-			//Files.exists(webAddressFile);
-			byte[] fileContents =  Files.readAllBytes(webAddressFile);
-			/*
-			System.err.println();
-			for(int i = 0; i < fileContents.length; i++)
-			{
-				System.err.print(fileContents[i] + " "); 
-			}
-			System.err.println();
-			*/
-			os.write(fileContents);
-		}
-		catch (Exception e) //If the file does not exists displays a 404 error
-		{
-	        //System.err.println("404 error");
-			System.err.println(webAddressFile +" is not found"); 
-	        os.write("404 Not Found".getBytes());
-		}//End try-catch
-	}//End else
+		//Creates the date and time in Mountain Time
+		Date d = new Date();
+		DateFormat df = DateFormat.getDateTimeInstance();
+		df.setTimeZone(TimeZone.getTimeZone("America/Denver"));
+		
+		//Turns the date into string
+		String dateString = df.format(d);
+		
+		//Replaces all the iterations of certain tags with teir replacements
+		String s2 = s1.replaceAll("<cs371date>", dateString);
+		String s3 = s2.replaceAll("<cs371server>", "Test Server");
+		
+		//Outputs to the os after replacements are done
+		os.write(s3.getBytes());
+	}
+	catch (Exception e) //If the file does not exists displays a 404 error
+	{
+        //System.err.println("404 error");
+        os.write("404 Not Found".getBytes());
+	}//End try-catch
 }//End writeContent
 
 } // end class

@@ -1,13 +1,6 @@
 <?xml version = "1.0"?>
 <project name = "SimpleWebServer" basedir = ".">
 		
-	<target name="compile">
-    	<javac includeantruntime="false" srcdir="." includes="WebServer.java,WebWorker.java"/>
-    </target>
-    
-    <target name="run" depends="compile">
-    	<java classname="WebServer" fork="true"/>
-    	<java classname="WebWorker" fork="true"/>
-    </target>
+    <javac includeantruntime="false" srcdir="."/>
 	
 </project>
