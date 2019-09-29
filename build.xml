@@ -1,6 +1,0 @@
-<?xml version = "1.0"?>
-<project name = "SimpleWebServer" basedir = ".">
-		
-    <javac includeantruntime="false" srcdir="."/>
-	
-</project>
