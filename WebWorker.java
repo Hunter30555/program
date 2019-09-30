@@ -158,10 +158,6 @@ private void writeHTTPHeader(OutputStream os, String contentType) throws Excepti
    return;
 }
 
-public String convertFromBaseToBase(String str, int fromBase, int toBase) 
-{
-    return Integer.toString(Integer.parseInt(str, fromBase), toBase);
-}
 /**
 * Write the data content to the client network connection. This MUST
 * be done after the HTTP header has been written out.
