@@ -65,7 +65,7 @@ public static void main(String args[])
       System.err.println("Error: scores must be between 0 and 50!");
       return;
    }
-   IglooScore2 score = new IglooScore2();
+   IglooScore1 score = new IglooScore1();
    score.recordScores(s1,s2,s3);
    System.out.println("Overall score: " + score.overallScore());
    return;

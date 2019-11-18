@@ -159,14 +159,14 @@
    	
    	<echo message=""/>
    	
-   	<echo message="TEST IglooScore1: 1 2 0"/>
+   	<echo message="TEST IglooScore1: 50 50 50"/>
 	<java classname="IglooScore1" fork="true">
-	   <arg value="1"/><arg value="2"/><arg value="0"/>
+	   <arg value="50"/><arg value="50"/><arg value="50"/>
 	   <jvmarg line="-javaagent:${jacocodir}/jacocoagent.jar"/>
 	</java>
-	<echo message="TEST IglooScore2: 1 2 0"/>
+	<echo message="TEST IglooScore2: 50 50 50"/>
 	<java classname="IglooScore2" fork="true">
-	   <arg value="1"/><arg value="2"/><arg value="0"/>
+	   <arg value="50"/><arg value="50"/><arg value="50"/>
 	   <jvmarg line="-javaagent:${jacocodir}/jacocoagent.jar"/>
 	</java>
    </target>
