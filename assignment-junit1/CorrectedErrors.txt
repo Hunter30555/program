@@ -1,0 +1,22 @@
+
+In the Circle class:
+    The scale funtion would add the factor to the radius when the comments said it was suppose to be multiplied by the factor.
+     I changed this to multiply the radius by the factor rather than add the factor. This was found by the scaleCircles test.
+
+    The moveBy function would add the xOffset to both the x and y coordinates which contradicted the comments above it.
+     I changed this by making the xOffset affect the x coordinate and the yOffset affect the y coordinate. This was found by the simpleMove and simpleMoveNeg test when I tried different circles. 
+
+In the Circle1 class:
+    The intersection method would only check if the x distance and y distance between the two circles was less than the radius of one of them. 
+     I changed the intersection function by changing both instances of radius to (radius + other.radius) so that it would check for interseting circles correctly. The circlesIntersectingFalse found this issue.
+
+In the Circle2 class: 
+    The constructor was (y,x,radius) whcih is wrong because the center point according to the constructor in the Circle abstract class is supose to be (x,y,rad).
+     This was changed to (x,y,radius) so that the circle would have the correct center point. This problem was found with the moveBy test.
+
+    The intersection method would only check if the distance between the two circles was less than the radius of one of them. 
+     I changed this to be (distance < (radius + other.radius)) so that it could identify if they intersected based on both of their radii. The circlesIntersectingFalse found this issue.
+
+
+In the Circle 1 and Circle 2 interection function both didn't check if a circle was within another circle and not intersecting.
+   I fixed this by adding |radius-other.radius| < distance beteen both points. Ihis issue was found with test circlesIntersectingFalse2.
